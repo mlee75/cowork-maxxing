@@ -1,0 +1,13 @@
+{
+  "name": "progressive-8",
+  "description": "The same 8 rules as on-demand skills. Generated from corpus/ — do not hand-edit.",
+  "args": [
+    "--setting-sources",
+    "",
+    "--strict-mcp-config"
+  ],
+  "plugin_dir": "configs/progressive-8",
+  "carries_rules": true,
+  "rule_count": 8,
+  "generated": true
+}

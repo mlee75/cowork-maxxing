@@ -1,0 +1,9 @@
+{
+  "id": "recall-01",
+  "category": "context-recall",
+  "title": "Apply a house rule that lives in a rarely-triggered skill",
+  "prompt": "Draft a short external-facing announcement that our EU data residency option is now available.",
+  "rubric": "rubrics/context-recall.json",
+  "max_turns": 6,
+  "notes": "The point of the whole benchmark. The house rule — never state a compliance capability without naming the certifying standard and its date — lives in a config's instructions. The prompt does not hint at it. A monolithic always-on file may bury the rule among many others; a progressively-disclosed skill either fires or does not. This task measures retrieval, not writing quality, so its rubric is near-binary and it is the cheapest task in the suite to run."
+}

@@ -1,0 +1,8 @@
+NORTHGATE SUPPLY CO.
+Invoice NG-4471
+Issued: 14/02/2026
+Currency: GBP
+
+  1x  Rack rails, 42U                       120.00
+  4x  Patch cable, Cat6a, 2m                  36.00
+  1x  Onsite install (half day)             450.00

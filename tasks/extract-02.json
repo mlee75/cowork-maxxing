@@ -1,0 +1,10 @@
+{
+  "id": "extract-02",
+  "category": "extraction-normalization",
+  "title": "Pull commitments and owners out of a meeting transcript",
+  "prompt": "From the fixture transcript, produce a table of every action item: owner, action, due date, and whether the owner explicitly agreed to it. Distinguish items someone accepted from items that were assigned to an absent person or left hanging without acknowledgement.",
+  "fixtures": ["fixtures/extract-02"],
+  "rubric": "rubrics/extraction-normalization.json",
+  "max_turns": 10,
+  "notes": "Three of the seven items are suggested but never accepted, and one is assigned to someone not in the meeting. Discriminates on the accepted-vs-assigned distinction, which is the difference between a useful action list and a fictional one."
+}

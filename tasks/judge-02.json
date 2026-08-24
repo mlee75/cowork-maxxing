@@ -1,0 +1,10 @@
+{
+  "id": "judge-02",
+  "category": "judgment-analysis",
+  "title": "Decide what to cut under a hard constraint",
+  "prompt": "The fixture lists nine planned features with estimates and rationale. The team has capacity for four. Choose the four, and — more importantly — write the two-sentence justification you would give to the owner of each feature you cut. Do not propose ways to fit more in; the constraint is fixed.",
+  "fixtures": ["fixtures/judge-02"],
+  "rubric": "rubrics/judgment-analysis.json",
+  "max_turns": 10,
+  "notes": "Discriminates on constraint compliance and on whether the model will deliver an unwelcome message plainly. The common failure is proposing a phased approach that smuggles in a fifth and sixth feature, which the prompt explicitly forecloses."
+}

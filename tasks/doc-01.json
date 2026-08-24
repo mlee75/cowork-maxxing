@@ -1,0 +1,9 @@
+{
+  "id": "doc-01",
+  "category": "document-generation",
+  "title": "Decision memo from a thin brief",
+  "prompt": "Write a decision memo recommending whether to build, buy, or defer a customer-facing status page. Assume a 12-person engineering team, an existing on-call rotation, and two enterprise customers who have asked for one in the last quarter. The memo must state the recommendation in the first two sentences, give the reasoning, name what would change the recommendation, and end with the specific decision being asked for.",
+  "rubric": "rubrics/document-generation.json",
+  "max_turns": 8,
+  "notes": "No fixtures — this measures output structure and discipline under a house format, which is exactly what a memory file or skill is supposed to encode. Baseline should produce a competent but generically-shaped memo; a config carrying a memo format should produce the house shape. Largest expected quality gap of any task in the suite."
+}

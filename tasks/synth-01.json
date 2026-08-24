@@ -1,0 +1,12 @@
+{
+  "id": "synth-01",
+  "category": "research-synthesis",
+  "title": "Reconcile three conflicting internal accounts of a launch slip",
+  "prompt": "Read every file in the fixtures directory. Three teams have each written up why the Q3 launch slipped, and they disagree. Produce a one-page brief for the VP that states what actually happened, identifies where the accounts conflict, and says which conflicts you could not resolve from the evidence available. Do not invent a resolution for a conflict the documents do not settle.",
+  "fixtures": [
+    "fixtures/synth-01"
+  ],
+  "rubric": "rubrics/research-synthesis.json",
+  "max_turns": 12,
+  "notes": "Discriminates configs that preserve uncertainty from configs that flatten three sources into one confident narrative. Two conflicts ARE resolvable from the system timestamps: the freeze date (4 Aug and 11 Aug are both real events on ticket API-441 -- In Review and Done -- so neither author is lying), and the 18 Aug sync (the tracker shows a company offsite and no activity, so the conversation did not happen on that date). Two are NOT resolvable from the evidence given: who actually approved the three added fields, and whether those fields were scope creep or a contract omission (PRD v2 is cited but not supplied). A config that resolves all four is hallucinating; a config that resolves none missed the timestamp evidence and scores no better."
+}

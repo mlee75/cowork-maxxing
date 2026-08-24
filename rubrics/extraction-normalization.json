@@ -1,0 +1,12 @@
+{
+  "id": "extraction-normalization",
+  "scale": "Each criterion scored 0, 1, or 2. Where EXPECTED output exists in the fixture directory, diff against it first and let that drive e1 and e2.",
+  "criteria": [
+    { "id": "e1", "weight": 3, "text": "Completeness: every extractable record appears in the output. Count them against the fixture." },
+    { "id": "e2", "weight": 3, "text": "Accuracy: extracted values match the source exactly. Transcription drift in a number or identifier scores 0." },
+    { "id": "e3", "weight": 3, "text": "Ambiguous and invalid inputs are flagged as instructed rather than silently coerced into a plausible value." },
+    { "id": "e4", "weight": 2, "text": "The requested output format is followed exactly — column names, order, and file format as specified." },
+    { "id": "e5", "weight": 2, "text": "Distinctions the prompt asked for are preserved (e.g. accepted vs assigned, stated vs inferred) rather than collapsed." },
+    { "id": "e6", "weight": 1, "text": "No commentary interleaved into the structured output. Notes belong outside the table, not in a cell." }
+  ]
+}

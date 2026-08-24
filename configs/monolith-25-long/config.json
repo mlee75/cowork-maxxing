@@ -1,0 +1,13 @@
+{
+  "name": "monolith-25-long",
+  "description": "25 rules in one always-on memory file. Generated from corpus/ — do not hand-edit.",
+  "args": [
+    "--setting-sources",
+    "",
+    "--strict-mcp-config"
+  ],
+  "append_system_prompt_file": "configs/monolith-25-long/CLAUDE.md",
+  "carries_rules": true,
+  "rule_count": 25,
+  "generated": true
+}

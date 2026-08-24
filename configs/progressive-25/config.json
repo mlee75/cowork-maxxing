@@ -1,0 +1,13 @@
+{
+  "name": "progressive-25",
+  "description": "The same 25 rules as on-demand skills. Generated from corpus/ — do not hand-edit.",
+  "args": [
+    "--setting-sources",
+    "",
+    "--strict-mcp-config"
+  ],
+  "plugin_dir": "configs/progressive-25",
+  "carries_rules": true,
+  "rule_count": 25,
+  "generated": true
+}

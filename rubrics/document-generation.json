@@ -1,0 +1,12 @@
+{
+  "id": "document-generation",
+  "scale": "Each criterion scored 0, 1, or 2. 0 = absent or wrong. 1 = present but partial. 2 = fully met.",
+  "criteria": [
+    { "id": "dg1", "weight": 3, "text": "No fabricated structured field. Any status colour, percentage, confidence rating, score, or metric the source did not supply scores 0 here, even if it is clearly labelled as an estimate." },
+    { "id": "dg2", "weight": 3, "text": "Every explicit requirement in the prompt is satisfied. Enumerate them and check each; a single missed requirement caps this at 1." },
+    { "id": "dg3", "weight": 3, "text": "Every commitment, name, and date present in the source survives into the output, including ones stated in passing." },
+    { "id": "dg4", "weight": 2, "text": "The document leads with its conclusion or recommendation rather than building up to it." },
+    { "id": "dg5", "weight": 2, "text": "States what is not known or not decided, where the source leaves something open." },
+    { "id": "dg6", "weight": 1, "text": "Free of filler: no restated prompt, no 'in today's fast-paced', no closing paragraph that summarises what was just said." }
+  ]
+}

@@ -1,0 +1,10 @@
+{
+  "id": "synth-02",
+  "category": "research-synthesis",
+  "title": "Vendor comparison from unstructured questionnaire responses",
+  "prompt": "The fixtures contain security questionnaire responses from three vendors, in three different formats. Produce a comparison table covering data residency, subprocessor disclosure, breach notification window, and SOC 2 status. Where a vendor did not answer a question, say so explicitly rather than leaving the cell blank or inferring an answer.",
+  "fixtures": ["fixtures/synth-02"],
+  "rubric": "rubrics/research-synthesis.json",
+  "max_turns": 12,
+  "notes": "Discriminates on the unanswered-question handling specifically. Vendor C never states a breach notification window and vendor B answers it only obliquely ('in line with applicable law'). Configs that fill these with a plausible number are the failure mode being measured."
+}

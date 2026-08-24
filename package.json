@@ -1,0 +1,17 @@
+{
+  "name": "cowork-maxxing",
+  "license": "MIT",
+  "version": "0.1.0",
+  "description": "A benchmark for Cowork configurations: quality and token cost, measured rather than asserted.",
+  "type": "module",
+  "private": true,
+  "scripts": {
+    "build": "node runner/build-configs.mjs",
+    "cost": "node runner/context-cost.mjs",
+    "dry": "node runner/run.mjs --dry-run",
+    "sweep": "node runner/run.mjs --repeats 3",
+    "judge": "node runner/judge.mjs --judges 3",
+    "report": "node runner/report.mjs"
+  },
+  "engines": { "node": ">=18" }
+}

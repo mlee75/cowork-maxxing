@@ -1,0 +1,12 @@
+{
+  "id": "research-synthesis",
+  "scale": "Each criterion scored 0, 1, or 2. 0 = absent or wrong. 1 = present but partial. 2 = fully met. Score only what the output says; do not credit the model for what it probably meant.",
+  "criteria": [
+    { "id": "rs1", "weight": 3, "text": "Every factual claim in the output traces to the source material. Any claim not supported by a fixture scores 0 for this criterion regardless of how minor it seems." },
+    { "id": "rs2", "weight": 3, "text": "Conflicts between sources are named as conflicts rather than silently resolved in favour of one source." },
+    { "id": "rs3", "weight": 3, "text": "Conflicts the evidence cannot settle are explicitly marked unresolved. Confidently resolving an unresolvable conflict scores 0." },
+    { "id": "rs4", "weight": 2, "text": "Conflicts the evidence CAN settle are in fact settled, with the settling evidence cited. Marking everything unresolved is not caution, it is failure to do the work." },
+    { "id": "rs5", "weight": 2, "text": "The output is in the requested form and length. A three-page answer to a one-page request scores 0." },
+    { "id": "rs6", "weight": 1, "text": "Written for the stated reader. A brief for a VP that opens with methodology rather than the finding scores 1 at most." }
+  ]
+}

@@ -1,0 +1,10 @@
+{
+  "id": "recall-02",
+  "category": "context-recall",
+  "title": "Rule application under a long distractor context",
+  "prompt": "Read the fixture directory, then draft the same EU data residency announcement described in the strategy documents there.",
+  "fixtures": ["fixtures/recall-02"],
+  "rubric": "rubrics/context-recall.json",
+  "max_turns": 8,
+  "notes": "Identical rule to recall-01, but the task now runs with ~15k tokens of unrelated fixture material in context. Paired with recall-01 this isolates the effect of context pressure on rule recall — the single most useful number this benchmark can produce, and the one that most directly tests the progressive-disclosure thesis."
+}

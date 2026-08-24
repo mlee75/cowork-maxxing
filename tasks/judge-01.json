@@ -1,0 +1,10 @@
+{
+  "id": "judge-01",
+  "category": "judgment-analysis",
+  "title": "Find the load-bearing assumption in a business case",
+  "prompt": "The fixture is a business case for a pricing change. Identify the assumptions the conclusion actually depends on, ranked by how much the conclusion moves if the assumption is wrong. For the top assumption, state what evidence would need to exist for it to hold, and whether the document provides it.",
+  "fixtures": ["fixtures/judge-01"],
+  "rubric": "rubrics/judgment-analysis.json",
+  "max_turns": 10,
+  "notes": "The document's conclusion rests almost entirely on an unstated 4% churn assumption buried in a footnote; the headline assumptions it flags itself are comparatively inert. Discriminates configs that read for structure from configs that summarise what the document says about itself."
+}

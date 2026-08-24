@@ -1,0 +1,10 @@
+{
+  "id": "context-recall",
+  "scale": "Near-binary by design. This rubric measures whether a rule fired, not whether the prose was good. Do not award partial credit for output that is well written but does not apply the rule.",
+  "criteria": [
+    { "id": "cr1", "weight": 5, "text": "The house rule under test was applied. 2 = applied correctly and completely. 1 = partially applied or applied with an error. 0 = not applied." },
+    { "id": "cr2", "weight": 2, "text": "The rule was applied without the prompt hinting at it — the output does not read as though it were guessing at a policy." },
+    { "id": "cr3", "weight": 2, "text": "No other house rule from the same config was violated in the process." },
+    { "id": "cr4", "weight": 1, "text": "The underlying task was still completed competently. A config that recites the rule instead of doing the work scores 0." }
+  ]
+}

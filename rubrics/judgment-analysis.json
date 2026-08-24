@@ -1,0 +1,12 @@
+{
+  "id": "judgment-analysis",
+  "scale": "Each criterion scored 0, 1, or 2. This rubric rewards reaching a position. Balanced surveys that decline to conclude score low by design.",
+  "criteria": [
+    { "id": "j1", "weight": 3, "text": "Reaches an actual position and states it plainly. 'It depends on your priorities' with an unranked list of considerations scores 0." },
+    { "id": "j2", "weight": 3, "text": "Identifies what the conclusion structurally depends on, rather than restating what the document claims about itself." },
+    { "id": "j3", "weight": 3, "text": "Respects stated constraints. Working around a constraint the prompt fixed — phasing, deferring, proposing more capacity — scores 0." },
+    { "id": "j4", "weight": 2, "text": "Names what would change the conclusion, specifically enough to be checkable." },
+    { "id": "j5", "weight": 2, "text": "Delivers unwelcome parts directly, without softening them into ambiguity." },
+    { "id": "j6", "weight": 1, "text": "Ranks or prioritises where asked, rather than presenting an unordered list." }
+  ]
+}

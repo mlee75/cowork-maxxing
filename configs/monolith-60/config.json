@@ -1,0 +1,13 @@
+{
+  "name": "monolith-60",
+  "description": "60 rules in one always-on memory file. Generated from corpus/ — do not hand-edit.",
+  "args": [
+    "--setting-sources",
+    "",
+    "--strict-mcp-config"
+  ],
+  "append_system_prompt_file": "configs/monolith-60/CLAUDE.md",
+  "carries_rules": true,
+  "rule_count": 60,
+  "generated": true
+}

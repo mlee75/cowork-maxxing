@@ -1,0 +1,6 @@
+{
+  "name": "baseline",
+  "description": "No memory file, no skills, no project settings. The floor. Every other config is measured as a delta from this.",
+  "args": ["--setting-sources", "", "--strict-mcp-config"],
+  "carries_rules": false
+}

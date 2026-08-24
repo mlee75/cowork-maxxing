@@ -1,0 +1,10 @@
+{
+  "id": "doc-02",
+  "category": "document-generation",
+  "title": "Rewrite a rambling update into a status report",
+  "prompt": "The fixture is a transcript of someone verbally giving a project update. Turn it into a written status report. Keep every commitment and date they actually made. Do not add a status colour, percentage complete, or risk rating that they did not state.",
+  "fixtures": ["fixtures/doc-02"],
+  "rubric": "rubrics/document-generation.json",
+  "max_turns": 8,
+  "notes": "Discriminates on fabricated structure. Status report templates invite a RAG status and a % complete; the speaker gives neither. Inventing them is the measured failure. The transcript also contains one commitment stated as an aside ('I'll get Dana the schema Thursday') that is easy to drop."
+}

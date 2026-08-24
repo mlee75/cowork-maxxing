@@ -1,0 +1,10 @@
+{
+  "id": "extract-01",
+  "category": "extraction-normalization",
+  "title": "Normalise dates and amounts from mixed-format invoices",
+  "prompt": "Extract every line item from the fixture invoices into a single CSV with columns: vendor, invoice_id, issue_date (ISO 8601), currency, amount, description. The invoices use different date conventions. Where a date is genuinely ambiguous, put the raw string in a seventh column named ambiguous_raw and leave issue_date empty rather than guessing.",
+  "fixtures": ["fixtures/extract-01"],
+  "rubric": "rubrics/extraction-normalization.json",
+  "max_turns": 10,
+  "notes": "Contains 03/04/2026, which is unresolvable without knowing the vendor's locale, and 2026-13-01, which is invalid. Discriminates configs that flag ambiguity from configs that silently pick US convention. Deterministic ground truth exists in fixtures/extract-01/EXPECTED.csv — this is the one task scoreable without a judge."
+}
