@@ -1,8 +1,8 @@
 vendor,invoice_id,issue_date,currency,amount,description,ambiguous_raw
-Northgate Supply Co.,NG-4471,2026-02-14,GBP,120.00,"Rack rails, 42U",
-Northgate Supply Co.,NG-4471,2026-02-14,GBP,36.00,"Patch cable, Cat6a, 2m (4x)",
-Northgate Supply Co.,NG-4471,2026-02-14,GBP,450.00,Onsite install (half day),
-Corvid Analytics,CV-2026-0088,,USD,2400.00,"Platform subscription, March",03/04/2026
-Corvid Analytics,CV-2026-0088,,USD,288.00,Overage: 1.2M events,03/04/2026
-Lumen Works,LW-19,,EUR,3000.00,Design retainer,2026-13-01
-Lumen Works,LW-19,,EUR,900.00,"Illustration, 6 spots",2026-13-01
+Tallow & Reed Supply Co.,TR-4471,2026-02-14,GBP,120.00,"Rack rails, 42U",
+Tallow & Reed Supply Co.,TR-4471,2026-02-14,GBP,36.00,"Patch cable, Cat6a, 2m (4x)",
+Tallow & Reed Supply Co.,TR-4471,2026-02-14,GBP,450.00,Onsite install (half day),
+Grackle Analytics,GK-2026-0088,,USD,2400.00,"Platform subscription, March",03/04/2026
+Grackle Analytics,GK-2026-0088,,USD,288.00,Overage: 1.2M events,03/04/2026
+Candlewick Works,CW-19,,EUR,3000.00,Design retainer,2026-13-01
+Candlewick Works,CW-19,,EUR,900.00,"Illustration, 6 spots",2026-13-01

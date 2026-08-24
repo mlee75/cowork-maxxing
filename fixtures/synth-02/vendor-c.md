@@ -1,5 +1,5 @@
 {
-  "vendor": "Halcyon Data Inc.",
+  "vendor": "Marrowbone Data Inc.",
   "questionnaire_version": "2026.1",
   "responses": {
     "data_residency": "EU only. Frankfurt (primary), Dublin (failover). No US infrastructure.",
