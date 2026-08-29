@@ -1,0 +1,12 @@
+{
+  "id": "code-04",
+  "category": "code-convention",
+  "title": "Implement a function following an unstated house convention",
+  "prompt": "test/transfer.test.js expects a transfer function that does not exist yet. Create src/transfer.js so the suite passes.",
+  "workspace": "workspaces/code-04",
+  "verify": true,
+  "allow_writes": true,
+  "rubric": "rubrics/code.json",
+  "max_turns": 20,
+  "notes": "The code analogue of recall-01, and the most important task on this side. The prompt says nothing about error handling; the tests only require that something throws. The house convention — AppError with a SCREAMING_SNAKE code, never a bare Error — lives in the config, and src/errors.js plus src/account.js show the pattern in the repo itself. So the task separates three things: whether the rule reached the model at all, whether the model inferred the convention from surrounding code without any rule, and whether delivery mechanism changes that. Baseline can plausibly pass the convention checks by imitation, which is the interesting part."
+}

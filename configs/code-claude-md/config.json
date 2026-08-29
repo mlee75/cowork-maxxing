@@ -1,0 +1,11 @@
+{
+  "name": "code-claude-md",
+  "description": "Conventions as a CLAUDE.md in the project root, discovered the way Claude Code discovers one in a real repo.",
+  "args": [
+    "--strict-mcp-config"
+  ],
+  "workspace_memory_file": "configs/code-claude-md/CLAUDE.md",
+  "carries_rules": true,
+  "domain": "code",
+  "generated": true
+}

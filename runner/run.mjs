@@ -2,8 +2,9 @@
 // Executes every (task x config) pair headlessly and records output + token usage.
 // Usage: node runner/run.mjs [--dry-run] [--model sonnet] [--tasks a,b] [--configs a,b] [--repeats 3]
 
-import { readFileSync, writeFileSync, readdirSync, mkdirSync, existsSync } from 'node:fs'
-import { execFile } from 'node:child_process'
+import { readFileSync, writeFileSync, readdirSync, mkdirSync, existsSync, mkdtempSync, rmSync, cpSync, copyFileSync } from 'node:fs'
+import { execFile, execFileSync } from 'node:child_process'
+import { tmpdir } from 'node:os'
 import { join, resolve, dirname } from 'node:path'
 import { fileURLToPath } from 'node:url'
 
@@ -53,10 +54,54 @@ function buildArgs(task, config) {
     args.push('--append-system-prompt', readFileSync(join(ROOT, config.append_system_prompt_file), 'utf8'))
   }
   if (config.plugin_dir) args.push('--plugin-dir', join(ROOT, config.plugin_dir))
-  // Read-only sweep: the suite never asks a task to modify anything.
-  args.push('--disallowed-tools', 'Write,Edit,NotebookEdit')
+  // Code tasks must be able to edit their own workspace copy. Everything else
+  // is a read-only sweep and is held to that.
+  if (!task.allow_writes) args.push('--disallowed-tools', 'Write,Edit,NotebookEdit')
   args.push('--permission-mode', 'acceptEdits')
   return args
+}
+
+// Each code run gets a pristine copy of the workspace, so runs cannot see or
+// inherit each other's edits. A config carrying a project memory file has it
+// placed in the copy's root, where the CLI discovers it exactly as it would in
+// a real repository — which is a different mechanism from injecting the same
+// text into the system prompt, and the difference is worth measuring.
+function prepareWorkspace(task, config) {
+  const src = join(ROOT, task.workspace)
+  const dir = mkdtempSync(join(tmpdir(), `cwm-${task.id}-`))
+  cpSync(src, dir, { recursive: true })
+  if (config.workspace_memory_file) copyFileSync(join(ROOT, config.workspace_memory_file), join(dir, 'CLAUDE.md'))
+  return { dir, src }
+}
+
+// Ground truth decided by running code, not by a model. The verifier lives in
+// verifiers/ and is never copied into the workspace — an agent that can read
+// the checks can satisfy them without doing the work.
+function verifyWorkspace(dir, verifier) {
+  try {
+    const out = execFileSync('node', [verifier], { cwd: dir, stdio: 'pipe', timeout: 120000 }).toString()
+    const parsed = JSON.parse(out.trim().split('\n').at(-1))
+    const checks = parsed.checks ?? []
+    return { checks, passed: checks.filter((c) => c.ok).length, total: checks.length, ok: checks.length > 0 && checks.every((c) => c.ok) }
+  } catch (e) {
+    return { checks: [], passed: 0, total: 0, ok: false, error: String(e.stderr ?? e).slice(0, 300) }
+  }
+}
+
+// The artifact of a code task is the diff, not the chat text. Capture it for
+// the judge, and measure its size — an enormous diff that passes is still a
+// review cost, and nothing else in the harness would see that.
+function captureDiff(src, dir) {
+  try {
+    execFileSync('diff', ['-ru', '--exclude=CLAUDE.md', '--exclude=node_modules', src, dir], { stdio: 'pipe' })
+    return { diff: '', added: 0, removed: 0, files: 0 }
+  } catch (e) {
+    const d = (e.stdout?.toString() ?? '')
+    const added = (d.match(/^\+(?!\+\+)/gm) ?? []).length
+    const removed = (d.match(/^-(?!--)/gm) ?? []).length
+    const files = new Set((d.match(/^diff -ru .*/gm) ?? [])).size
+    return { diff: d.length > 20000 ? d.slice(0, 20000) + '\n[diff truncated]' : d, added, removed, files }
+  }
 }
 
 // Two output modes. `json` returns one object whose shape is verified against
@@ -67,11 +112,11 @@ function buildArgs(task, config) {
 const applyStream = (args, stream) =>
   stream ? [...args.slice(0, args.indexOf('json')), 'stream-json', '--verbose', ...args.slice(args.indexOf('json') + 1)] : args
 
-const runOne = (args, stream) =>
+const runOne = (args, stream, cwd) =>
   new Promise((res) => {
     const started = Date.now()
     const full = applyStream(args, stream)
-    execFile('claude', full, { cwd: ROOT, maxBuffer: 128 * 1024 * 1024 }, (err, stdout, stderr) => {
+    execFile('claude', full, { cwd: cwd ?? ROOT, maxBuffer: 128 * 1024 * 1024 }, (err, stdout, stderr) => {
       const wall_ms = Date.now() - started
       if (!stdout) return res({ ok: false, error: String(stderr || err).slice(0, 500), wall_ms })
       if (!stream) {
@@ -129,7 +174,11 @@ for (const config of configs) {
         continue
       }
       process.stdout.write(`  ${label} … `)
-      const r = await runOne(args, STREAM)
+      const ws = task.workspace ? prepareWorkspace(task, config) : null
+      const r = await runOne(args, STREAM, ws?.dir)
+      const verify = ws ? verifyWorkspace(ws.dir, join(ROOT, 'verifiers', `${task.id}.mjs`)) : null
+      const diff = ws ? captureDiff(ws.src, ws.dir) : null
+      if (ws) rmSync(ws.dir, { recursive: true, force: true })
       const u = r.raw?.usage ?? {}
       const record = {
         run_id: RUN_ID,
@@ -144,6 +193,8 @@ for (const config of configs) {
         wall_ms: r.wall_ms,
         num_turns: r.raw?.num_turns ?? null,
         telemetry: r.telemetry ?? null,
+        verify,
+        diff,
         cost_usd: r.raw?.total_cost_usd ?? null,
         usage: {
           input: u.input_tokens ?? 0,
@@ -154,10 +205,12 @@ for (const config of configs) {
       }
       writeFileSync(join(outDir, `${config.name}__${task.id}__r${rep}.json`), JSON.stringify(record, null, 2))
       const fired = record.telemetry?.skills_fired ?? null
+      const v = verify ? `  verify ${verify.passed}/${verify.total}${verify.ok ? ' PASS' : ' FAIL'}` : ''
+      const dstat = diff ? `  diff +${diff.added}/-${diff.removed}` : ''
       console.log(
         record.ok
           ? `ok  ${record.usage.input + record.usage.cache_read} in / ${record.usage.output} out  $${(record.cost_usd ?? 0).toFixed(4)}` +
-              (fired ? `  skills: ${fired.length ? fired.join(',') : 'none'}` : '')
+              (fired ? `  skills: ${fired.length ? fired.join(',') : 'none'}` : '') + v + dstat
           : `FAIL ${record.error?.slice(0, 80)}`
       )
     }

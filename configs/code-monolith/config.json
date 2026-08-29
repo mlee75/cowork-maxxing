@@ -1,0 +1,13 @@
+{
+  "name": "code-monolith",
+  "description": "The same conventions injected into the system prompt rather than discovered as a project file.",
+  "args": [
+    "--setting-sources",
+    "",
+    "--strict-mcp-config"
+  ],
+  "append_system_prompt_file": "configs/code-monolith/CLAUDE.md",
+  "carries_rules": true,
+  "domain": "code",
+  "generated": true
+}

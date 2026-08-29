@@ -148,3 +148,52 @@ lines.push(
 )
 writeFileSync(join(ROOT, 'configs', 'CONTEXT-COST.md'), lines.join('\n'))
 console.log(lines.join('\n'))
+
+// ---------------------------------------------------------------------------
+// Claude Code side: the same rule corpus delivered three ways, one of which is
+// the mechanism Claude Code users actually have — a CLAUDE.md in the project
+// root that is auto-loaded. That is not the same as injecting the text into
+// the system prompt, and whether it behaves the same is an open question this
+// benchmark can now answer.
+// ---------------------------------------------------------------------------
+const codeRules = readdirSync(join(ROOT, 'corpus-code'))
+  .filter((f) => f.endsWith('.md'))
+  .map((f) => {
+    const raw = readFileSync(join(ROOT, 'corpus-code', f), 'utf8')
+    const m = /^---\n([\s\S]*?)\n---\n([\s\S]*)$/.exec(raw)
+    if (!m) throw new Error(`corpus-code/${f}: missing frontmatter`)
+    const fm = Object.fromEntries(m[1].split('\n').map((l) => { const i = l.indexOf(':'); return [l.slice(0, i).trim(), l.slice(i + 1).trim()] }))
+    return { id: fm.id, description: fm.description, body: m[2].trim() }
+  })
+  .sort((a, b) => a.id.localeCompare(b.id))
+
+const codeMd = ['# Project conventions', '', 'These apply to all code in this repository.', '', ...codeRules.flatMap((r) => [`## ${title(r.id)}`, '', r.body, ''])].join('\n')
+const baseArgs = ['--setting-sources', '', '--strict-mcp-config']
+
+const codeBaseline = fresh(join(ROOT, 'configs', 'code-baseline'))
+writeFileSync(join(codeBaseline, 'config.json'), JSON.stringify({ name: 'code-baseline', description: 'No conventions supplied. The floor for code tasks.', args: baseArgs, carries_rules: false, domain: 'code', generated: true }, null, 2))
+
+// Delivery 1: a real CLAUDE.md dropped into the project root of each run's
+// workspace copy. run.mjs places it; the CLI discovers it the way it would in
+// any real repository.
+const codeMdDir = fresh(join(ROOT, 'configs', 'code-claude-md'))
+writeFileSync(join(codeMdDir, 'CLAUDE.md'), codeMd)
+writeFileSync(join(codeMdDir, 'config.json'), JSON.stringify({ name: 'code-claude-md', description: 'Conventions as a CLAUDE.md in the project root, discovered the way Claude Code discovers one in a real repo.', args: ['--strict-mcp-config'], workspace_memory_file: 'configs/code-claude-md/CLAUDE.md', carries_rules: true, domain: 'code', generated: true }, null, 2))
+
+// Delivery 2: the identical text injected into the system prompt.
+const codeMono = fresh(join(ROOT, 'configs', 'code-monolith'))
+writeFileSync(join(codeMono, 'CLAUDE.md'), codeMd)
+writeFileSync(join(codeMono, 'config.json'), JSON.stringify({ name: 'code-monolith', description: 'The same conventions injected into the system prompt rather than discovered as a project file.', args: baseArgs, append_system_prompt_file: 'configs/code-monolith/CLAUDE.md', carries_rules: true, domain: 'code', generated: true }, null, 2))
+
+// Delivery 3: the identical bodies as on-demand skills.
+const codeProg = fresh(join(ROOT, 'configs', 'code-progressive'))
+mkdirSync(join(codeProg, '.claude-plugin'), { recursive: true })
+writeFileSync(join(codeProg, '.claude-plugin', 'plugin.json'), JSON.stringify({ name: 'project-conventions', version: '0.1.0', description: 'Project coding conventions as on-demand skills.' }, null, 2))
+for (const r of codeRules) {
+  mkdirSync(join(codeProg, 'skills', r.id), { recursive: true })
+  writeFileSync(join(codeProg, 'skills', r.id, 'SKILL.md'), `---\nname: ${r.id}\ndescription: ${r.description}\n---\n\n${r.body}\n`)
+}
+writeFileSync(join(codeProg, 'config.json'), JSON.stringify({ name: 'code-progressive', description: 'The same conventions as on-demand skills.', args: baseArgs, plugin_dir: 'configs/code-progressive', carries_rules: true, domain: 'code', generated: true }, null, 2))
+
+const codeOn = codeRules.reduce((a, r) => a + `name: ${r.id}\ndescription: ${r.description}\n`.length, 0)
+console.log(`\ncode configs: ${codeRules.length} rules · claude-md/monolith always-on ${codeMd.length} ch · progressive always-on ${codeOn} ch (${(((codeMd.length - codeOn) / codeMd.length) * 100).toFixed(1)}% lighter)`)

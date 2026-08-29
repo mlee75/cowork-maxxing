@@ -11,7 +11,10 @@
     "dry": "node runner/run.mjs --dry-run",
     "sweep": "node runner/run.mjs --repeats 3",
     "judge": "node runner/judge.mjs --judges 3",
-    "report": "node runner/report.mjs"
+    "report": "node runner/report.mjs",
+    "selftest": "node runner/selftest.mjs"
   },
-  "engines": { "node": ">=18" }
+  "engines": {
+    "node": ">=18"
+  }
 }

@@ -1,0 +1,12 @@
+{
+  "id": "code",
+  "scale": "Each criterion scored 0, 1, or 2. Correctness is NOT in this rubric — it is decided by running the code. Score only what execution cannot see. Do not reward an answer for being correct, and do not penalise it for being wrong; that is already counted.",
+  "criteria": [
+    { "id": "cd1", "weight": 3, "text": "The change is minimal and targeted. Rewriting untouched code, reformatting, or renaming beyond what the task required scores 0 — a large diff is a review cost even when it works." },
+    { "id": "cd2", "weight": 3, "text": "The solution follows the conventions visible in the surrounding code — error style, export style, naming, module layout — whether or not any instruction stated them." },
+    { "id": "cd3", "weight": 2, "text": "No dependency was added, no build step introduced, and no file created that the task did not require." },
+    { "id": "cd4", "weight": 2, "text": "Edge cases beyond the ones the tests name are handled, or their omission is explicitly noted. Passing the given tests by special-casing their exact inputs scores 0." },
+    { "id": "cd5", "weight": 2, "text": "Any explanation given is accurate about what was changed and why. An explanation that misdescribes the diff scores 0." },
+    { "id": "cd6", "weight": 1, "text": "Comments, where added, explain why rather than restating what the line does." }
+  ]
+}

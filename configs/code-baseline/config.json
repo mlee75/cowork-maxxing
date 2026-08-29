@@ -1,0 +1,12 @@
+{
+  "name": "code-baseline",
+  "description": "No conventions supplied. The floor for code tasks.",
+  "args": [
+    "--setting-sources",
+    "",
+    "--strict-mcp-config"
+  ],
+  "carries_rules": false,
+  "domain": "code",
+  "generated": true
+}

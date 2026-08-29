@@ -1,0 +1,12 @@
+{
+  "id": "code-03",
+  "category": "code-refactor",
+  "title": "Remove duplication without changing behaviour",
+  "prompt": "src/validate.js contains two functions with overlapping logic. Remove the duplication. Both exports must keep their current names and behaviour, and the existing tests must still pass unchanged.",
+  "workspace": "workspaces/code-03",
+  "verify": true,
+  "allow_writes": true,
+  "rubric": "rubrics/code.json",
+  "max_turns": 20,
+  "notes": "Tests pass before the work starts, so the failure mode is regression rather than non-completion. The verifier requires all four of: tests still pass, both exports survive, and the shared rule text appears exactly once. Discriminates configs that carry a refactor-safety rule from configs that quietly change error ordering or drop a branch while unifying."
+}

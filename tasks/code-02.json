@@ -1,0 +1,12 @@
+{
+  "id": "code-02",
+  "category": "code-testing",
+  "title": "Write tests that actually distinguish banker's rounding",
+  "prompt": "This project has no tests. Write a test suite for the exported function under test/, using node:test.",
+  "workspace": "workspaces/code-02",
+  "verify": true,
+  "allow_writes": true,
+  "rubric": "rubrics/code.json",
+  "max_turns": 20,
+  "notes": "Scored by mutation, not by coverage. The verifier runs the suite against the real implementation (must pass) and then against mutants/rounding.mutant.js, which rounds ties away from zero instead of to even (must fail). A suite that only checks 1.4 and 1.6 passes both and is worthless — Math.round satisfies it. This is the one task in the whole benchmark where a plausible-looking output is caught being empty, and it maps directly to the test-meaningfully rule."
+}

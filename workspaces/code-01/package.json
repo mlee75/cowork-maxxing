@@ -1,0 +1,8 @@
+{
+  "name": "code-01",
+  "type": "module",
+  "private": true,
+  "scripts": {
+    "test": "node --test"
+  }
+}

@@ -1,0 +1,13 @@
+{
+  "name": "code-progressive",
+  "description": "The same conventions as on-demand skills.",
+  "args": [
+    "--setting-sources",
+    "",
+    "--strict-mcp-config"
+  ],
+  "plugin_dir": "configs/code-progressive",
+  "carries_rules": true,
+  "domain": "code",
+  "generated": true
+}

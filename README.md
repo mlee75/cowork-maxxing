@@ -116,16 +116,50 @@ maintained by hand:
 | `progressive-8` / `-25` / `-60` | The same N rules as on-demand skills. |
 | `monolith-25-terse` / `-25-long` | 25 rules, bodies at ~103 and ~1,728 ch. |
 | `progressive-25-terse` / `-25-long` | The same, as skills. Descriptions unchanged. |
+| `code-baseline` | No conventions. The floor for code tasks. |
+| `code-claude-md` | Conventions as a real `CLAUDE.md` in the project root. |
+| `code-monolith` | The identical text injected into the system prompt. |
+| `code-progressive` | The identical bodies as on-demand skills. |
+
+`code-claude-md` matters on its own: it is the mechanism Claude Code users
+actually have. Whether an auto-discovered project memory file behaves the
+same as the same text injected into the system prompt is an open question,
+and these two configs differ in nothing else.
 
 The corpus is tiered: `-8` is tier 1, `-25` is tiers 1–2, `-60` is all
 three. Editing `configs/monolith-*` or `configs/progressive-*` by hand is
 pointless — the next build overwrites it. Edit `corpus/` and rebuild.
 
-**Five task categories**, ten seed tasks: research synthesis, document
-generation, extraction and normalisation, judgment and analysis, and
-context recall. The last is the point of the whole suite — a house rule the
-prompt never hints at, tested with and without heavy distractor context, to
-isolate what context pressure does to rule retrieval.
+**Fourteen seed tasks across two domains.**
+
+*Cowork side (10 tasks)* — research synthesis, document generation,
+extraction and normalisation, judgment and analysis, and context recall. The
+last is the point of that half: a house rule the prompt never hints at,
+tested with and without heavy distractor context, to isolate what context
+pressure does to rule retrieval.
+
+*Claude Code side (4 tasks)* — bug fix, test writing, refactor, and
+convention-following, each in a real workspace with a real test suite. This
+half has something the other cannot: **ground truth you can execute.**
+Correctness is decided by running the code, so the judge is never asked
+whether an answer was right, only whether the change was minimal, idiomatic,
+and honestly described.
+
+`code-02` is scored by *mutation*: the suite the agent writes must pass
+against the correct implementation and fail against a deliberately wrong one.
+A test file that only checks `1.4` and `1.6` passes both and is caught being
+empty — which coverage metrics would not catch.
+
+`code-04` is the code analogue of `recall-01`. The prompt says nothing about
+error handling and the tests only require that *something* throws; the house
+convention lives in the config, and the repo itself demonstrates the pattern.
+So it separates three things: whether the rule reached the model, whether the
+model inferred the convention from surrounding code with no rule at all, and
+whether delivery mechanism changes either.
+
+Verifiers and mutants live in `verifiers/`, never inside the workspace — an
+agent that can read the checks can satisfy them without doing the work. Each
+run gets a fresh temp copy, so runs cannot inherit each other's edits.
 
 Every task's `notes` field names what it discriminates between and where the
 trap is. A task whose `notes` cannot state that is decoration and gets cut.
@@ -138,6 +172,10 @@ node runner/build-configs.mjs
 
 ```bash
 node runner/context-cost.mjs
+```
+
+```bash
+npm run selftest
 ```
 
 ```bash
@@ -157,6 +195,11 @@ node runner/report.mjs --run-id <id>
 ```
 
 Requires the `claude` CLI, authenticated, and Node 18+. No dependencies.
+
+`selftest` runs no model at all: it stages every code task twice — untouched
+and with its reference solution — and asserts each verifier fails on the
+first and passes on the second. A check that cannot do both measures nothing.
+Run it after touching a workspace or a verifier.
 
 `context-cost.mjs` measures each config's real always-on token cost with a
 trivial probe, which supersedes the chars/4 arithmetic in
@@ -216,6 +259,12 @@ on every sweep, and should be cut. The benchmark audits itself.
 - **No `--max-turns` in CLI 2.1.221**, so task `max_turns` is advisory. A
   runaway agent can distort cost figures for its config; check `num_turns`
   in the raw records before trusting a cost delta.
+- **Four code tasks is too few for solve-rate statistics.** Solve rate is a
+  per-task binary, so its interval is much wider than the rubric's: in
+  validation, a planted +33pt gap still reported as *not distinguishable*.
+  That is the statistics behaving correctly, and it means code-side deltas
+  are directional until the suite reaches roughly 8-10 tasks. The report
+  flags this itself.
 - **Statistics do not fix a small suite.** Ten tasks and three repeats is
   enough to detect a large effect and not enough to detect a real 2-point
   one. The report flags this in its suite-health section rather than

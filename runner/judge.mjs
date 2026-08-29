@@ -34,7 +34,7 @@ const tasks = Object.fromEntries(
   })
 )
 
-function judgePrompt(task, rubric, output) {
+function judgePrompt(task, rubric, output, diff) {
   return [
     'You are scoring one output against a rubric. You are not improving it and not commenting on it.',
     '',
@@ -47,7 +47,11 @@ function judgePrompt(task, rubric, output) {
     '',
     `## Criteria\n\n${rubric.criteria.map((c) => `- **${c.id}** (weight ${c.weight}): ${c.text}`).join('\n')}`,
     '',
-    `## The output being scored\n\n<output>\n${output}\n</output>`,
+    // For a code task the artifact is the diff. Judging the chat text instead
+    // rewards a good explanation of a bad change.
+    diff
+      ? `## The change that was made\n\n<diff>\n${diff}\n</diff>\n\n## What the agent said about it\n\n<output>\n${output}\n</output>`
+      : `## The output being scored\n\n<output>\n${output}\n</output>`,
     '',
     'Return ONLY a JSON object, no prose and no code fence, of the form:',
     '{"scores":[{"id":"<criterion id>","score":0|1|2,"evidence":"<= 25 words quoting or pointing at what decided it"}]}'
@@ -85,7 +89,7 @@ const weighted = (rubric, scores) => {
 const out = []
 for (const f of files) {
   const rec = loadJson(join(runDir, f))
-  if (!rec.ok || !rec.output) {
+  if (!rec.ok || (!rec.output && !rec.diff?.diff)) {
     console.log(`  skip ${f} (run failed)`)
     continue
   }
@@ -107,7 +111,7 @@ for (const f of files) {
 
   const panel = []
   for (let j = 0; j < JUDGES; j++) {
-    const r = await ask(judgePrompt(task, rubric, rec.output))
+    const r = await ask(judgePrompt(task, rubric, rec.output, rec.diff?.diff || null))
     if (r.ok) panel.push(r.parsed.scores)
   }
   if (!panel.length && !det) {
@@ -141,11 +145,13 @@ for (const f of files) {
     judge_disagreement: judged ? +(disagreements / judged).toFixed(2) : null,
     deterministic_criteria: det?.deterministic ?? [],
     telemetry: rec.telemetry ?? null,
+    verify: rec.verify ?? null,
+    diff_size: rec.diff ? { added: rec.diff.added, removed: rec.diff.removed, files: rec.diff.files } : null,
     usage: rec.usage,
     cost_usd: rec.cost_usd,
     wall_ms: rec.wall_ms
   })
-  console.log(`${score.pct}%${det ? ` (${det.deterministic.length} criteria measured, not judged)` : ''}${judged && disagreements ? ` [panel split on ${disagreements}/${judged}]` : ''}`)
+  console.log(`${score.pct}%${rec.verify ? ` · verify ${rec.verify.passed}/${rec.verify.total}${rec.verify.ok ? ' PASS' : ' FAIL'}` : ''}${det ? ` (${det.deterministic.length} criteria measured, not judged)` : ''}${judged && disagreements ? ` [panel split on ${disagreements}/${judged}]` : ''}`)
 }
 
 writeFileSync(join(runDir, '_scores.json'), JSON.stringify(out, null, 2))

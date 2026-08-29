@@ -65,6 +65,58 @@ for (const c of configs) {
 }
 L.push('', '"Not distinguishable" means the interval crosses zero. It is not a small', 'effect — it is no measured effect, and must not be reported as one.', '')
 
+// --- executable ground truth ------------------------------------------------
+// Where the answer can be run, running it beats judging it. Solve rate is the
+// headline for code tasks; the rubric only covers what execution cannot see.
+const codeRows = scores.filter((s) => s.verify)
+if (codeRows.length) {
+  const codeTasks = uniq(codeRows.map((s) => s.task_id))
+  const solveRate = (cfg) => {
+    const rows = codeRows.filter((s) => s.config === cfg)
+    return rows.length ? (rows.filter((r) => r.verify.ok).length / rows.length) * 100 : null
+  }
+  const solveDelta = (cfg) => {
+    const pairs = codeTasks
+      .map((t) => {
+        const a = codeRows.filter((s) => s.config === cfg && s.task_id === t)
+        const b = codeRows.filter((s) => s.config === BASE && s.task_id === t)
+        if (!a.length || !b.length) return null
+        return mean(a.map((r) => (r.verify.ok ? 100 : 0))) - mean(b.map((r) => (r.verify.ok ? 100 : 0)))
+      })
+      .filter((x) => x !== null)
+    if (pairs.length < 2) return null
+    const r = rng(0x5eed)
+    const ms = []
+    for (let i = 0; i < BOOT; i++) { let s = 0; for (let j = 0; j < pairs.length; j++) s += pairs[(r() * pairs.length) | 0]; ms.push(s / pairs.length) }
+    ms.sort((a, b) => a - b)
+    return { point: mean(pairs), lo: ms[Math.floor(BOOT * 0.025)], hi: ms[Math.floor(BOOT * 0.975)] }
+  }
+  L.push('## Solve rate (executed, not judged)', '', '| Config | Runs | Solved | Δ vs base (95% CI) | Mean diff size |', '|---|---|---|---|---|')
+  for (const c of uniq(codeRows.map((s) => s.config))) {
+    const rows = codeRows.filter((s) => s.config === c)
+    const d = c === BASE ? null : solveDelta(c)
+    const dTxt = !d ? '—' : `${d.point >= 0 ? '+' : ''}${d.point.toFixed(0)}pt (${d.lo.toFixed(0)}, ${d.hi.toFixed(0)})${d.lo > 0 ? ' **better**' : d.hi < 0 ? ' **worse**' : ' not distinguishable'}`
+    const ds = rows.filter((r) => r.diff_size)
+    L.push(`| \`${c}\` | ${rows.length} | ${solveRate(c).toFixed(0)}% | ${dTxt} | ${ds.length ? `+${Math.round(mean(ds.map((r) => r.diff_size.added)))}/-${Math.round(mean(ds.map((r) => r.diff_size.removed)))}` : '—'} |`)
+  }
+  L.push('', 'Solve rate is the fraction of runs where every ground-truth check passed.', 'It is measured by running the code, so it carries none of the judge\'s bias.', '')
+
+  // Per-check, because "solved" hides which half failed. A run that passes the
+  // tests but violates the house convention is the case the whole benchmark
+  // was built to detect, and it is invisible in an aggregate.
+  const checkIds = uniq(codeRows.flatMap((s) => s.verify.checks.map((c) => c.id)))
+  L.push('### Individual checks', '', `| Config | ${checkIds.map((c) => `\`${c}\``).join(' | ')} |`, `|---|${checkIds.map(() => '---').join('|')}|`)
+  for (const c of uniq(codeRows.map((s) => s.config))) {
+    const cells = checkIds.map((id) => {
+      const rows = codeRows.filter((s) => s.config === c && s.verify.checks.some((x) => x.id === id))
+      if (!rows.length) return '—'
+      return `${((rows.filter((r) => r.verify.checks.find((x) => x.id === id)?.ok).length / rows.length) * 100).toFixed(0)}%`
+    })
+    L.push(`| \`${c}\` | ${cells.join(' | ')} |`)
+  }
+  L.push('')
+}
+
 // --- skill firing: the causal question --------------------------------------
 const withTel = scores.filter((s) => s.telemetry)
 if (withTel.length) {
@@ -107,6 +159,11 @@ for (const t of tasks) {
 const reps = uniq(scores.map((s) => s.repeat)).length
 if (reps < 2) { L.push(`- Only ${reps} repeat per pair. Within-config variance is unmeasured, so the intervals above understate true uncertainty.`); flagged++ }
 if (tasks.length < 5) { L.push(`- Only ${tasks.length} tasks paired. Bootstrap intervals on fewer than ~5 tasks are wide and unstable.`); flagged++ }
+const nCode = uniq(scores.filter((s) => s.verify).map((s) => s.task_id)).length
+if (nCode && nCode < 8) {
+  L.push(`- Only ${nCode} code tasks. Solve rate is a per-task binary, so its interval is far wider than the rubric's — a 30pt gap can still read as not distinguishable here. Treat solve-rate deltas as directional until the code suite reaches ~8-10 tasks.`)
+  flagged++
+}
 if (!flagged) L.push('No issues flagged.')
 
 const md = L.join('\n') + '\n'

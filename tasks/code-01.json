@@ -1,0 +1,12 @@
+{
+  "id": "code-01",
+  "category": "code-correctness",
+  "title": "Fix a CSV splitter that fails on quoting",
+  "prompt": "The test suite in this project is failing. Run it, find out why, and fix the source so it passes. Do not change the tests.",
+  "workspace": "workspaces/code-01",
+  "verify": true,
+  "allow_writes": true,
+  "rubric": "rubrics/code.json",
+  "max_turns": 20,
+  "notes": "The simplest possible code task, and the control for the rest. Correctness is fully determined by the suite: a naive split() fails on quoted commas, doubled quotes, and whitespace inside quotes. Discriminates on whether a config helps at all on work whose success criterion is already explicit — if a config cannot beat baseline here, its gains elsewhere are probably about following instructions rather than about capability."
+}
